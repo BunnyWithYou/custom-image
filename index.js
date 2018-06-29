@@ -21,15 +21,6 @@ function init(req, res) {
     if (url.parse(req.url).pathname === '/favicon.ico') {
         return;
     }
-    console.log(url.parse(req.url))
-    let params = {}
-    if (url.parse(req.url).query) {
-        let argArr = url.parse(req.url).query.split('&');
-        for (let i = 0; i < argArr.length; i++) {
-            let arg = argArr[i].split('=');
-            params[arg[0]] = arg[1];
-        }
-    }
     res.writeHead(200, {
         'Content-Type': 'image/jpeg;charset=utf-8'
     });
@@ -37,7 +28,7 @@ function init(req, res) {
         res.write('<head><meta charset="utf-8"/></head>');
         res.end('请输入文件名')
     } else {
-        console.log(__dirname + url.parse(req.url).pathname);
+        let params = url.parse(req.url, true).query
         fs.readFile(__dirname + url.parse(req.url).pathname, function (err, myImage) {
             let newImage;
             let buImage = new Buffer(myImage);
@@ -46,7 +37,7 @@ function init(req, res) {
             } else if (params.w) {
                 newImage = images(buImage).resize(Number(params.w)).encode('jpg');
             } else if (params.h) {
-                newImage = images(buImage).resize(Number(params.h)).encode('jpg');
+                newImage = images(buImage).resize(null,Number(params.h)).encode('jpg');
             } else {
                 newImage = buImage
             }
