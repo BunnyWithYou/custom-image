@@ -6,7 +6,8 @@ const querystring = require('querystring');
 const path = require('path');
 
 const SERVER_CONFIG = {
-    'port': 4000
+    'basePath': '/images', //存放图片的目录
+    'port': 4000 //端口
 }
 
 let server = http.createServer((req, res) => {
@@ -18,7 +19,8 @@ server.listen(SERVER_CONFIG.port, () => {
 })
 
 function init(req, res) {
-    if (url.parse(req.url).pathname === '/favicon.ico') {
+    let urlObj = url.parse(req.url, true)
+    if (urlObj.pathname === '/favicon.ico') {
         return;
     }
     res.writeHead(200, {
@@ -28,21 +30,31 @@ function init(req, res) {
         res.write('<head><meta charset="utf-8"/></head>');
         res.end('请输入文件名')
     } else {
-        let params = url.parse(req.url, true).query
-        fs.readFile(__dirname + url.parse(req.url).pathname, function (err, myImage) {
+        let params = urlObj.query;
+        fs.readFile(__dirname + SERVER_CONFIG.basePath + urlObj.pathname, function (err, myImage) {
             let newImage;
-            let buImage = new Buffer(myImage);
-            if (params.w && params.h) {
-                newImage = images(buImage).resize(Number(params.w), Number(params.h)).encode('jpg');
-            } else if (params.w) {
-                newImage = images(buImage).resize(Number(params.w)).encode('jpg');
-            } else if (params.h) {
-                newImage = images(buImage).resize(null,Number(params.h)).encode('jpg');
+            let bufImage = new Buffer(myImage);
+            let imageOption = {
+                w: Number(params.w),
+                h: Number(params.h),
+                o: Number(params.o) || 100,
+            }
+            if (imageOption.w && imageOption.h) {
+                newImage = images(bufImage).resize(Number(imageOption.w), Number(imageOption.h)).encode('jpg', {
+                    operation: imageOption.o
+                });
+            } else if (imageOption.w) {
+                newImage = images(bufImage).resize(Number(imageOption.w)).encode('jpg', {
+                    operation: imageOption.o
+                });
+            } else if (imageOption.h) {
+                newImage = images(bufImage).resize(null, Number(params.h)).encode('jpg', {
+                    operation: imageOption.o
+                });
             } else {
-                newImage = buImage
+                newImage = bufImage
             }
             res.end(newImage);
         });
-
     }
 }
