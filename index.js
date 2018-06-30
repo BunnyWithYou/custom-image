@@ -18,6 +18,7 @@ server.listen(SERVER_CONFIG.port, () => {
     console.log(`GetImage Server Running at http://${SERVER_CONFIG.host}:${SERVER_CONFIG.port}`)
 })
 
+
 let imgNameList = {
     'jpeg':'image/jpeg',
     'jpg':'image/jpeg',
