@@ -22,7 +22,8 @@ server.listen(SERVER_CONFIG.port, () => {
 let imgNameList = {
     'jpeg':'image/jpeg',
     'jpg':'image/jpeg',
-    'png':'image/png'
+    'png':'image/png',
+    'gif':'image/gif'
 }
 
 function init(req, res) {
@@ -30,6 +31,7 @@ function init(req, res) {
     if (urlObj.pathname === '/favicon.ico') {
         return;
     }
+    console.log(path.extname(urlObj.pathname))
     res.writeHead(200, {
         'Content-Type': 'image/jpeg;charset=utf-8'
     });
