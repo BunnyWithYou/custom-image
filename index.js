@@ -5,6 +5,10 @@ const fs = require('fs');
 const querystring = require('querystring');
 const path = require('path');
 
+const {
+    handleImg
+} = require('./handleImg');
+
 const SERVER_CONFIG = {
     'basePath': 'images', //存放图片的目录
     'port': 4000 //端口
@@ -42,7 +46,7 @@ function init(req, res) {
         let params = urlObj.query;
         fs.readFile(path.join(__dirname, SERVER_CONFIG.basePath, urlObj.pathname), function (err, myImage) {
             console.log(err);
-            if(!err){
+            if (!err) {
                 let newImage;
                 let bufImage = new Buffer(myImage);
                 let imageOption = {
@@ -50,32 +54,18 @@ function init(req, res) {
                     h: Number(params.h),
                     o: Number(params.o) || 100,
                 }
-                if (imageOption.w && imageOption.h) {
-                    newImage = images(bufImage).resize(Number(imageOption.w), Number(imageOption.h)).encode('jpg', {
-                        operation: imageOption.o
-                    });
-                } else if (imageOption.w) {
-                    newImage = images(bufImage).resize(Number(imageOption.w)).encode('jpg', {
-                        operation: imageOption.o
-                    });
-                } else if (imageOption.h) {
-                    newImage = images(bufImage).resize(null, Number(params.h)).encode('jpg', {
-                        operation: imageOption.o
-                    });
-                } else {
-                    newImage = bufImage
-                }
+                newImage = handleImg(bufImage, imageOption.w, imageOption.h, imageOption.o, imgExtname)
                 res.writeHead(200, {
                     'Content-Type': extNameList[imgExtname] + ';charset=utf-8'
                 });
                 res.end(newImage);
-            }else{
+            } else {
                 res.writeHead(200, {
                     'Content-Type': 'text/html;charset=utf-8'
                 });
                 res.write('<head><meta charset="utf-8"/></head>');
                 res.end('找不到文件')
-            } 
+            }
         });
     }
 }
