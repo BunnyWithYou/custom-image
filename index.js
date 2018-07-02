@@ -6,7 +6,7 @@ const querystring = require('querystring');
 const path = require('path');
 
 const SERVER_CONFIG = {
-    'basePath': '/images', //存放图片的目录
+    'basePath': 'images', //存放图片的目录
     'port': 4000 //端口
 }
 
@@ -19,11 +19,11 @@ server.listen(SERVER_CONFIG.port, () => {
 })
 
 
-let imgNameList = {
-    'jpeg':'image/jpeg',
-    'jpg':'image/jpeg',
-    'png':'image/png',
-    'gif':'image/gif'
+let extNameList = {
+    '.jpeg': 'image/jpeg',
+    '.jpg': 'image/jpeg',
+    '.png': 'image/png',
+    '.gif': 'image/gif'
 }
 
 function init(req, res) {
@@ -31,39 +31,51 @@ function init(req, res) {
     if (urlObj.pathname === '/favicon.ico') {
         return;
     }
-    console.log(path.extname(urlObj.pathname))
-    res.writeHead(200, {
-        'Content-Type': 'image/jpeg;charset=utf-8'
-    });
+    let imgExtname = path.extname(urlObj.pathname);
     if (path.extname(req.url) === '') {
+        res.writeHead(200, {
+            'Content-Type': 'text/html;charset=utf-8'
+        });
         res.write('<head><meta charset="utf-8"/></head>');
         res.end('请输入文件名')
     } else {
         let params = urlObj.query;
-        fs.readFile(__dirname + SERVER_CONFIG.basePath + urlObj.pathname, function (err, myImage) {
-            let newImage;
-            let bufImage = new Buffer(myImage);
-            let imageOption = {
-                w: Number(params.w),
-                h: Number(params.h),
-                o: Number(params.o) || 100,
-            }
-            if (imageOption.w && imageOption.h) {
-                newImage = images(bufImage).resize(Number(imageOption.w), Number(imageOption.h)).encode('jpg', {
-                    operation: imageOption.o
+        fs.readFile(path.join(__dirname, SERVER_CONFIG.basePath, urlObj.pathname), function (err, myImage) {
+            console.log(err);
+            if(!err){
+                let newImage;
+                let bufImage = new Buffer(myImage);
+                let imageOption = {
+                    w: Number(params.w),
+                    h: Number(params.h),
+                    o: Number(params.o) || 100,
+                }
+                if (imageOption.w && imageOption.h) {
+                    newImage = images(bufImage).resize(Number(imageOption.w), Number(imageOption.h)).encode('jpg', {
+                        operation: imageOption.o
+                    });
+                } else if (imageOption.w) {
+                    newImage = images(bufImage).resize(Number(imageOption.w)).encode('jpg', {
+                        operation: imageOption.o
+                    });
+                } else if (imageOption.h) {
+                    newImage = images(bufImage).resize(null, Number(params.h)).encode('jpg', {
+                        operation: imageOption.o
+                    });
+                } else {
+                    newImage = bufImage
+                }
+                res.writeHead(200, {
+                    'Content-Type': extNameList[imgExtname] + ';charset=utf-8'
                 });
-            } else if (imageOption.w) {
-                newImage = images(bufImage).resize(Number(imageOption.w)).encode('jpg', {
-                    operation: imageOption.o
+                res.end(newImage);
+            }else{
+                res.writeHead(200, {
+                    'Content-Type': 'text/html;charset=utf-8'
                 });
-            } else if (imageOption.h) {
-                newImage = images(bufImage).resize(null, Number(params.h)).encode('jpg', {
-                    operation: imageOption.o
-                });
-            } else {
-                newImage = bufImage
-            }
-            res.end(newImage);
+                res.write('<head><meta charset="utf-8"/></head>');
+                res.end('找不到文件')
+            } 
         });
     }
 }
