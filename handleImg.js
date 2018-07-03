@@ -7,7 +7,7 @@ const images = require('images');
  * @param {Number} o 需要设置图片的压缩比率(max 100)
  * @param {String} extname 图片的后缀名
  */
-module.exports.handleImg = function (buffImg, w, h, o, extname) {
+function handleImg(buffImg, w, h, o, extname) {
     let img = images(buffImg);
     if (w && h) {
         img = img.resize(w, h);
@@ -26,4 +26,8 @@ module.exports.handleImg = function (buffImg, w, h, o, extname) {
         });
     }
     return img;
+}
+
+exports = module.exports = {
+    handleImg
 }
