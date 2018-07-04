@@ -47,7 +47,10 @@ function init(req, res) {
         let imgList = fs.readdirSync(fullPath);
         console.log(imgList);
         for (let i = 0; i < imgList.length; i++) {
-            imgList[i] = 'http://' + SERVER_CONFIG.host + ':' + SERVER_CONFIG.port + '/' + imgList[i] + '?w=200';
+            imgList[i] = {
+                showUrl:'http://' + SERVER_CONFIG.host + ':' + SERVER_CONFIG.port + '/' + imgList[i] + '?w=200',
+                fullUrl: 'http://' + SERVER_CONFIG.host + ':' + SERVER_CONFIG.port + '/' + imgList[i]
+            }
         }
         let str = fs.readFileSync('./public/index.ejs', 'utf-8');
         let html = ejs.render(str, {

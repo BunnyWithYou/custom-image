@@ -27,10 +27,12 @@
 
         .box {
             width: 300px;
+            height: 300px;
             border: 1px solid #000;
-            padding: 50px;
             display: flex;
             flex-direction: column;
+            justify-content: center;
+            align-items: center;
         }
 
         .pic {
@@ -43,9 +45,9 @@
     <div class="main">
         <% for (var i=0;i<list.length;i++){ %>
             <div class="box">
-                <img class="pic" src="<%=list[i]%>" alt="">
+                <img class="pic" src="<%=list[i].showUrl%>" alt="">
                 <div>
-                    <%= list[i] %>
+                    <a href="<%= list[i].fullUrl %>"><%= list[i].fullUrl %></a>
                 </div>
             </div>
             <% } %>
