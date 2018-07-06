@@ -44,6 +44,11 @@ function init(req, res) {
             'Content-Type': 'text/html;charset=utf-8'
         });
         let fullPath = path.join(__dirname, SERVER_CONFIG.basePath, urlObj.pathname)
+        if(!fs.existsSync(fullPath)){
+          res.write('<head><meta charset="utf-8"/></head>');
+          res.end('找不到目录')
+          return;
+        }
         let imgList = fs.readdirSync(fullPath);
         console.log(imgList);
         for (let i = 0; i < imgList.length; i++) {
