@@ -84,7 +84,7 @@ function init(req, res) {
                     'Content-Type': 'text/html;charset=utf-8'
                 });
                 res.write('<head><meta charset="utf-8"/></head>');
-                res.end('找不到文件')
+                res.end('找不到文件') 
             }
         });
     }
