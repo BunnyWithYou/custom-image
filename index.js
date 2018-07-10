@@ -45,8 +45,13 @@ function init(req, res) {
         });
         let fullPath = path.join(__dirname, SERVER_CONFIG.basePath, urlObj.pathname)
         if(!fs.existsSync(fullPath)){
-          res.write('<head><meta charset="utf-8"/></head>');
-          res.end('找不到目录')
+          let str = fs.readFileSync('./public/404.ejs', 'utf-8');
+          let html = ejs.render(str, {
+            message: '找不到该目录',
+            version: process.version,
+            filename: __dirname
+          })
+          res.end(html)
           return;
         }
         let imgList = fs.readdirSync(fullPath);
@@ -80,11 +85,13 @@ function init(req, res) {
                 });
                 res.end(newImage);
             } else {
-                res.writeHead(200, {
-                    'Content-Type': 'text/html;charset=utf-8'
-                });
-                res.write('<head><meta charset="utf-8"/></head>');
-                res.end('找不到文件') 
+                let str = fs.readFileSync('./public/404.ejs', 'utf-8');
+                let html = ejs.render(str, {
+                  message: '找不到该文件',
+                  version: process.version,
+                  filename: __dirname
+                })
+                res.end(html)
             }
         });
     }
